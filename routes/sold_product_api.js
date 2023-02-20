@@ -11,6 +11,9 @@ router.get("/", async (req, res) => {
       {
         path: "product_id",
       },
+      {
+        path: "user_id",
+      }
       
     ]);
 
