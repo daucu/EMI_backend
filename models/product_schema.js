@@ -15,24 +15,20 @@ const product_schema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
   },
   category: {
     type: String,
-    required: true,
   },
   quantity: {
     type: Number,
     required: true,
+    default: 1,
   },
   status: {
     type: String,
     required: true,
-  },
-  sku: {
-    type: String,
-    required: true,
+    default: "active",
   },
 });
 
-module.exports = mongoose.model("product", product_schema);
+module.exports = mongoose.model("Product", product_schema);

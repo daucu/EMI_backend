@@ -1,19 +1,12 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
-require("dotenv").config();
 const cors = require("cors");
 const PORT = process.env.PORT || 4000;
-const multer = require("multer");
 const cookieParser = require("cookie-parser");
-const fs = require("fs");
-app.use(express.static(__dirname + "/"));
-app.use(cookieParser());
 
-app.use(express.json());
-
-app.get("/", (req, res) => {
-  res.json({ message: "EMI Api is  working" });
-});
+const connectDB = require("./config/database");
+connectDB();
 
 //Loop of allowed origins
 const allowedOrigins = [
@@ -22,6 +15,9 @@ const allowedOrigins = [
   "http://localhost:3001",
 ];
 
+app.use(express.static(__dirname + "/"));
+app.use(cookieParser());
+app.use(express.json());
 //CORS policy access
 app.use(
   cors({
@@ -29,11 +25,19 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser());
 
-const connectDB = require("./config/database");
-connectDB();
 
-app.use("/api/getuser", require("./routes/register"));
+
+app.get("/", (req, res) => {
+  res.json({ message: "EMI Api is  working" });
+});
+
+// register
+app.use("/api/register", require("./routes/register"));
+
+// users
+app.use("/api/users", require("./routes/users"));
 
 // singup API
 app.use("/api/signup", require("./routes/register"));
@@ -51,9 +55,21 @@ app.use("/api/profile", require("./Profile/Userprofile"));
 app.use("/api/product", require("./routes/product"));
 
 // sold product
-app.use("/api/soldproduct", require("./routes/sold_product_api"));
+app.use("/api/soldproduct", require("./routes/sold_product"));
+
+// file upload
+app.use("/api/upload", require("./routes/fileupload"));
 
 // Bank details
+app.use("/api/bank", require("./routes/bank"));
+
+// activity details
+app.use("/api/activity", require("./routes/activity"));
+
+// ride details
+app.use("/api/ride", require("./routes/ride_service"));
+
+
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);
 });

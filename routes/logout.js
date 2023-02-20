@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const User_Schema = require("../models/UserSignup");
+const User_Schema = require("../models/user_schema");
 require("dotenv").config();
 const bcryptjs = require("bcryptjs");
 

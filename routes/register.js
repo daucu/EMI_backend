@@ -1,69 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const User_Schema = require("../models/UserSignup");
+const User_Schema = require("../models/user_schema");
 const bcryptjs = require("bcryptjs");
-const upload = require("../config/image_upload");
+const Bank = require("../models/bank_schema");
 
-// get user
-router.get("/", async (req, res) => {
-  // res.json({ message: "Getting signup API" })
-  try {
-    const user = await User_Schema.find();
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: "error in getting user", status: "error" });
-  }
-});
-
-// code to count all users
-router.get("/count/alluser", async (req, res) => {
-  try {
-    const user = await User_Schema.find();
-    res.json(user.length);
-  } catch (error) {
-    res.status(500).json({ message: "error in getting user", status: "error" });
-  }
-});
-
-//  getting user by id from database
-router.get("/:id", async (req, res) => {
-  try {
-    const user = await User_Schema.findById(req.params.id);
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: "error in getting user", status: "error" });
-  }
-});
-
-// update uniqueKey of user by getting user
-router.patch("/update/:id", async (req, res) => {
-  try {
-    const user = await User_Schema.findById(req.params.id);
-    if (user == null) {
-      return res.status(404).json({ message: "user not found" });
-    }
-    if (req.body.uniqueKey != null) {
-      user.uniqueKey = req.body.uniqueKey;
-    }
-    const updatedUser = await user.save();
-    res.json(updatedUser);
-  } catch (error) {
-    res.status(500).json({ message: error.message, status: "error" });
-  }
-});
 
 // create user
-router.post(
-  "/",
-  upload.single("picture"),
-  SignupValidation,
-  async (req, res) => {
-    const url = req.protocol + "://" + req.get("host");
-    console.log(req.body);
+router.post("/", SignupValidation, async (req, res) => {
 
     // hashing password
     const salt = await bcryptjs.genSalt();
     const hashed_password = await bcryptjs.hash(req.body.password, salt);
+
+    const initBank = new Bank();
+
+    await initBank.save();
+
 
     const user = new User_Schema({
       name: req.body.name,
@@ -73,19 +25,9 @@ router.post(
       email: req.body.email,
       password: hashed_password,
       age: req.body.age,
-      image: url + "/medias/" + req.file.filename,
+      image: req.body.image,
       role: req.body.role,
-      bank_name: req.body.bank_name,
-      account_name: req.body.account_name,
-      account_type: req.body.account_type,
-      account_number: req.body.account_number,
-      pan_card: req.body.pan_card,
-      ifsc_code: req.body.ifsc_code,
-      branch_name: req.body.branch_name,
-      branch_address: req.body.branch_address,
-      branch_city: req.body.branch_city,
-      branch_state: req.body.branch_state,
-      branch_pincode: req.body.branch_pincode,
+      bank: initBank._id,
     });
 
     try {
@@ -96,39 +38,7 @@ router.post(
     }
   }
 );
-// code to update password of user by getting user id from database
-router.patch("/update/password/:id", async (req, res) => {
-  try {
-    const user = await User_Schema.findById(req.params.id);
-    if (user == null) {
-      return res.status(404).json({ message: "user not found" });
-    }
-    if (req.body.password != null) {
-      // hashing password
-      const salt = await bcryptjs.genSalt();
-      const hashed_password = await bcryptjs.hash(req.body.password, salt);
-      user.password = hashed_password;
-    }
-    const updatedUser = await user.save();
-    res.json(updatedUser);
-  } catch (error) {
-    res.status(500).json({ message: error.message, status: "error" });
-  }
-});
 
-//  code to delete user by getting user id from database
-router.delete("/delete/:id", async (req, res) => {
-  try {
-    const user = await User_Schema.findById(req.params.id);
-    if (user == null) {
-      return res.status(404).json({ message: "user not found" });
-    }
-    await user.remove();
-    res.json({ message: "user deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message, status: "error" });
-  }
-});
 
 // middleware for register user validation
 async function SignupValidation(req, res, next) {

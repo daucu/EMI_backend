@@ -2,10 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const emi_schema = new mongoose.Schema({
-  // code to create schema for emi
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "userSignup",
+    ref: "User",
   },
   total_amount: {
     type: Number,
@@ -27,6 +26,12 @@ const emi_schema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  history: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Emi",
+    }
+  ],
 });
 
-module.exports = mongoose.model("emi", emi_schema);
+module.exports = mongoose.model("Emi", emi_schema);

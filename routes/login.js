@@ -1,18 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const User_Schema = require("../models/UserSignup");
-require("dotenv").config();
+const User = require("../models/user_schema");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const cookiParser = require("cookie-parser");
 
-router.use(cookiParser());
+
 
 router.post("/", async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(req.body);
-    const user = await User_Schema.findOne({ email }).lean();
+    const user = await User.findOne({ email }).lean();
     if (!user)
       return res
         .status(400)
@@ -30,6 +28,7 @@ router.post("/", async (req, res) => {
       {
         id: user._id,
         email: user.email,
+        bank: user.bank,
       },
       process.env.JWT_SECRET,
       {
@@ -76,7 +75,7 @@ router.get("/check_have_token", (req, res) => {
     const id_from_token = have_valid_token.id;
 
     // check same id have database
-    const user_id = User_Schema.findById(id_from_token);
+    const user_id = User.findById(id_from_token);
     if (user_id == undefined) {
       res.json(false);
     } else {
@@ -110,7 +109,7 @@ router.get("/checkLogin", (req, res) => {
     const id_from_token = have_valid_token.id;
 
     // check same id have same database
-    const user_id = User_Schema.findById(id_from_token);
+    const user_id = User.findById(id_from_token);
     if (user_id == undefined) {
       res.json(false);
     } else {

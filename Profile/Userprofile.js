@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Register_Models = require("../models/UserSignup");
+const Register_Models = require("../models/user_schema");
 const JWT = require("jsonwebtoken");
 
 require("dotenv").config();
