@@ -15,19 +15,15 @@ router.post("/", SignupValidation, async (req, res) => {
     const initBank = new Bank();
 
     await initBank.save();
+    console.log(req.body);
 
 
     const user = new User_Schema({
-      name: req.body.name,
-      username: req.body.username,
-      phone: req.body.phone,
-      address: req.body.address,
-      email: req.body.email,
+      ...req.body,
       password: hashed_password,
-      age: req.body.age,
-      image: req.body.image,
-      role: req.body.role,
+      role: req.body.role || "seller",
       bank: initBank._id,
+      business_name: req.body.business_name || ""
     });
 
     try {
@@ -57,14 +53,6 @@ async function SignupValidation(req, res, next) {
       .status(400)
       .json({ message: "Email is not valid ", status: "error" });
 
-  //Check username is valid
-  const username = req.body.username;
-  const username_regex = /^[a-zA-Z0-9]{3,20}$/;
-  if (!username_regex.test(username))
-    return res.status(400).json({
-      message: "Username is not valid",
-      status: "error",
-    });
 
   //Check Phone Number is valid
   if (req.body.phone) {
@@ -73,17 +61,6 @@ async function SignupValidation(req, res, next) {
     if (!phone_regex.test(phone))
       return res.status(400).json({
         message: "Phone Number is not valid",
-        status: "error",
-      });
-  }
-
-  //check age
-  if (req.body.age) {
-    const age = req.body.age;
-    const min_age = 18;
-    if (age < min_age)
-      return res.status(400).json({
-        message: "You are not eligible because of your age is less than 18",
         status: "error",
       });
   }

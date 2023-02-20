@@ -39,8 +39,6 @@ app.use("/api/register", require("./routes/register"));
 // users
 app.use("/api/users", require("./routes/users"));
 
-// singup API
-app.use("/api/signup", require("./routes/register"));
 
 // login api
 app.use("/api/login", require("./routes/login"));
