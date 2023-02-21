@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const User_Schema = require("../models/user_schema");
+const jwt = require("jsonwebtoken");
 
 // get user
 router.get("/", async (req, res) => {
@@ -28,7 +29,7 @@ router.get("/count/alluser", async (req, res) => {
 });
 
 //  getting user by id from database
-router.get("/:id", async (req, res) => {
+router.get("/id/:id", async (req, res) => {
     try {
         const user = await User_Schema.findById(req.params.id);
         res.json(user);
@@ -87,5 +88,30 @@ router.delete("/delete/:id", async (req, res) => {
         res.status(500).json({ message: error.message, status: "error" });
     }
 });
+
+// get all users by seller 
+router.get("/seller", async (req, res) => {
+    try {
+        const token =req.headers["token"] || req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!decoded) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const user = await User_Schema.find({ seller: decoded.id }).populate([
+            {
+                path: "bank",
+            }
+        ]);
+        res.json(user);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message, status: "error" });
+    }
+});
+
 
 module.exports = router;

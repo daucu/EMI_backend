@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 
 
-router.post("/", async (req, res) => {
+router.post("/", validateLogin, async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(req.body);
@@ -14,14 +14,14 @@ router.post("/", async (req, res) => {
     if (!user)
       return res
         .status(400)
-        .json({ message: "email is wrong ", status: "warning" });
+        .json({ message: "Email is wrong ", status: "warning" });
 
     const hash_psw = user.password;
 
     if (!bcryptjs.compareSync(password, hash_psw))
       return res
         .status(400)
-        .json({ message: "  passord is wrong ", status: "warning" });
+        .json({ message: "Passord is wrong ", status: "warning" });
 
     // token
     const token = jwt.sign(
@@ -54,7 +54,7 @@ router.post("/", async (req, res) => {
     };
 
     res.status(200).json({
-      message: "login success",
+      message: "You have logged in successfully",
       status: "success",
       token: token,
       // user: res.locals.user,
@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
 });
 
 // check user is login or not
-router.get("/check_have_token", (req, res) => {
+router.get("/check", (req, res) => {
   try {
     let token = req.cookies.token || req.headers.token;
     // console.log(token);
@@ -119,5 +119,24 @@ router.get("/checkLogin", (req, res) => {
     res.json(false);
   }
 });
+
+function validateLogin(req, res, next) {
+  const { email, password } = req.body;
+  if (!email) {
+    return res.status(400).json({
+      message: "Please provide email",
+      status: "warning",
+    });
+  }
+  if (!password) {
+    return res.status(400).json({
+      message: "Please provide password",
+      status: "warning",
+    });
+  }
+
+  next();
+
+}
 
 module.exports = router;

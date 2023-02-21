@@ -38,6 +38,11 @@ const user_sehema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Bank",
   },
+  seller: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  }
+
 
 });
 

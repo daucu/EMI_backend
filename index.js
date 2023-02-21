@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 4000;
 const cookieParser = require("cookie-parser");
 
 const connectDB = require("./config/database");
+const logger = require("./config/logger");
 connectDB();
 
 //Loop of allowed origins
@@ -15,6 +16,7 @@ const allowedOrigins = [
   "http://localhost:3001",
 ];
 
+app.use(logger)
 app.use(express.static(__dirname + "/"));
 app.use(cookieParser());
 app.use(express.json());

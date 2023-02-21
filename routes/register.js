@@ -24,9 +24,9 @@ router.post("/", SignupValidation, async (req, res) => {
       address: req.body.address,
       email: req.body.email,
       password: hashed_password,
-      age: req.body.age,
-      image: req.body.image,
-      role: req.body.role,
+      age: req.body.age || "",
+      image: req.body.image || "",
+      role: req.body.role || "user",
       bank: initBank._id,
     });
 
@@ -77,16 +77,6 @@ async function SignupValidation(req, res, next) {
       });
   }
 
-  //check age
-  if (req.body.age) {
-    const age = req.body.age;
-    const min_age = 18;
-    if (age < min_age)
-      return res.status(400).json({
-        message: "You are not eligible because of your age is less than 18",
-        status: "error",
-      });
-  }
 
   next();
 }
