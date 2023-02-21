@@ -1,8 +1,6 @@
 const router = require('express').Router();
 
-const Emi = require('../models/emi_schema');
-const User = require('../models/user_schema');
-const Product = require('../models/product_schema');
+const { getAuthUser } = require('../config/authorizer');
 const Transaction = require('../models/transaction_schema');
 
 
@@ -18,7 +16,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const transaction = await Transaction.findById(id).populate([
@@ -38,9 +36,9 @@ router.get('/:id', async (req, res) => {
             transaction
         });
     } catch (error) {
-        res.status(500).json({ 
+        res.status(500).json({
             message: error.message
-         });
+        });
     }
 });
 
@@ -53,8 +51,8 @@ router.post('/', async (req, res) => {
             transaction: savedTransaction
         });
     } catch (error) {
-        res.status(500).json({ 
-            message: error.message 
+        res.status(500).json({
+            message: error.message
         });
     }
 });
@@ -63,7 +61,7 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const deletedTransaction = await Transaction.findByIdAndDelete(id);
-            
+
         res.json({
             message: 'Transaction deleted successfully',
             transaction: deletedTransaction
@@ -76,7 +74,34 @@ router.delete('/:id', async (req, res) => {
 
 });
 
+router.get("/seller", getAuthUser ,async (req, res) => {
+    try {
+        const user = req.user;
 
+        if(user.role !== "seller"){
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        
+        const transaction = await Transaction.find({ seller: user._id }).populate([
+            {
+                path: 'user_id'
+            },
+            {
+                path: 'device_id'
+            },
+            {
+                path: 'emi_id'
+            }
+        ]);
+
+        res.json({
+            message: 'Transaction details fetched successfully',
+            transaction
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+})
 
 
 

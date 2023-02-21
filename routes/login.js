@@ -53,10 +53,14 @@ router.post("/", validateLogin, async (req, res) => {
       },
     };
 
+    let userdata = user;
+    delete userdata.password;
+
     res.status(200).json({
       message: "You have logged in successfully",
       status: "success",
       token: token,
+      user: userdata,
       // user: res.locals.user,
     });
   } catch (error) {

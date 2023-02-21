@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 
 const connectDB = require("./config/database");
 const logger = require("./config/logger");
+const { getQRCode } = require("./routes/qrcode");
 connectDB();
 
 //Loop of allowed origins
@@ -17,7 +18,9 @@ const allowedOrigins = [
 ];
 
 app.use(logger)
-app.use(express.static(__dirname + "/"));
+app.use(express.static(__dirname + "/medias"));
+app.use(express.static(__dirname + "/qrcodes"));
+app.use(express.static(__dirname + "/uploads"));
 app.use(cookieParser());
 app.use(express.json());
 //CORS policy access
@@ -34,6 +37,16 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res.json({ message: "EMI Api is  working" });
 });
+app.get("/api/qrcode", async (req, res) => {
+  const qrcode = await getQRCode(req, {
+    additional: "additional",
+  });
+
+  res.json(qrcode);
+});
+
+app.use("/api/dashboard", require("./routes/dashboard"));
+
 
 // register
 app.use("/api/register", require("./routes/register"));
@@ -66,8 +79,12 @@ app.use("/api/bank", require("./routes/bank"));
 // activity details
 app.use("/api/activity", require("./routes/activity"));
 
-// ride details
-app.use("/api/ride", require("./routes/ride_service"));
+// activity details
+app.use("/api/devices", require("./routes/devices"));
+
+// activity details
+app.use("/api/transactions", require("./routes/transaction"));
+
 
 
 app.listen(PORT, () => {

@@ -3,38 +3,55 @@ const router = express.Router();
 const User_Schema = require("../models/user_schema");
 const bcryptjs = require("bcryptjs");
 const Bank = require("../models/bank_schema");
+const { getQRCode } = require("./qrcode");
 
 
 // create user
 router.post("/", SignupValidation, async (req, res) => {
 
-    // hashing password
-    const salt = await bcryptjs.genSalt();
-    const hashed_password = await bcryptjs.hash(req.body.password, salt);
+  // hashing password
+  const salt = await bcryptjs.genSalt();
+  const hashed_password = await bcryptjs.hash(req.body.password, salt);
 
-    const initBank = new Bank();
+  const initBank = new Bank();
+  await initBank.save();
 
-    await initBank.save();
-    console.log(req.body);
+  const user = new User_Schema({
+    ...req.body,
+    password: hashed_password,
+    age: req.body.age || "",
+    image: req.body.image || "",
+    role: req.body.role || "user",
+    bank: initBank._id,
+    business_name: req.body.business_name || ""
+  });
 
+  if(req.body.role === "seller"){
+    let qr_data = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
 
-    const user = new User_Schema({
-      ...req.body,
-      password: hashed_password,
-      age: req.body.age || "",
-      image: req.body.image || "",
-      role: req.body.role || "user",
-      bank: initBank._id,
-      business_name: req.body.business_name || ""
-    });
-
-    try {
-      const newUser = await user.save();
-      res.json(newUser);
-    } catch (error) {
-      res.status(500).json({ message: error.message, status: "error" });
+    let qr_code = "";
+    if (req.body.role === "seller") {
+      qr_code = await getQRCode(req, qr_data);
     }
+    user.qr_code = {
+      name: qr_code.file_name,
+      path: qr_code.file_path,
+      url: qr_code.file_url,
+    };
+  };
+
+  try {
+    const newUser = await user.save();
+    res.json(newUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message, status: "error" });
   }
+}
 );
 
 

@@ -44,9 +44,11 @@ const user_sehema = new mongoose.Schema({
   seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-  }
-
-
+  },
+  qr_code: {
+    // type: mixed,
+    type: mongoose.Schema.Types.Mixed,
+  },
 });
 
 module.exports = mongoose.model("User", user_sehema);

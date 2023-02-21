@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const User_Schema = require("../models/user_schema");
 const jwt = require("jsonwebtoken");
+const { getAuthUser } = require('../config/authorizer');
 
 // get user
 router.get("/", async (req, res) => {
@@ -90,23 +91,18 @@ router.delete("/delete/:id", async (req, res) => {
 });
 
 // get all users by seller 
-router.get("/seller", async (req, res) => {
+router.get("/seller",getAuthUser, async (req, res) => {
     try {
-        const token =req.headers["token"] || req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (!decoded) {
-            return res.status(401).json({ message: "Unauthorized" });
+        if(req.user.role !== "seller"){
+            return res.json({message:"You are not authorized."});
         }
 
-        const user = await User_Schema.find({ seller: decoded.id }).populate([
+        const user = await User_Schema.find({ seller: req.user._id }).populate([
             {
                 path: "bank",
             }
         ]);
-        res.json(user);
+        res.status(200).json(user);
 
     } catch (error) {
         res.status(500).json({ message: error.message, status: "error" });

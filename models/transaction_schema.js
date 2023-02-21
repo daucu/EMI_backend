@@ -6,13 +6,17 @@ const transactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
-    product_id: {
+    device_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
+        ref: 'Device',
     },
     emi_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Emi',
+    },
+    seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
     },
     amount: {
         type: Number,
