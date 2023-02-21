@@ -6,6 +6,9 @@ const user_sehema = new mongoose.Schema({
   name: {
     type: String,
   },
+  business_name: {
+    type: String,
+  },
   phone: {
     type: String,
   },
