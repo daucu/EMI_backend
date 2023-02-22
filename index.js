@@ -85,6 +85,8 @@ app.use("/api/devices", require("./routes/devices"));
 // activity details
 app.use("/api/transactions", require("./routes/transaction"));
 
+// history details
+app.use("/api/history", require("./routes/history"));
 
 
 app.listen(PORT, () => {

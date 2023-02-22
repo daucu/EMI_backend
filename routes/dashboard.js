@@ -16,12 +16,14 @@ router.get('/', getAuthUser, async (req, res) => {
             enrolled_devices = await Device.find({ seller: user._id, device_status: "enrolled" }).countDocuments();
             locked_devices = await Device.find({ seller: user._id, device_status: "locked" }).countDocuments();
             removed_devices = await Device.find({ seller: user._id, device_status: "removed" }).countDocuments();
+            licence_keys = enrolled_devices + locked_devices + removed_devices;
             return res.json({ enrolled_devices, licence_keys, locked_devices, removed_devices });
         }
         else if (user.role !== "admin") {
             enrolled_devices = await Device.find({ device_status: "enrolled" }).countDocuments();
             locked_devices = await Device.find({ device_status: "locked" }).countDocuments();
             removed_devices = await Device.find({ device_status: "removed" }).countDocuments();
+            licence_keys = enrolled_devices + locked_devices + removed_devices;
             return res.json({ enrolled_devices, licence_keys, locked_devices, removed_devices });
         }
         else {
