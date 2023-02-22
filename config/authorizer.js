@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 async function getAuthUser(req, res, next) {
     try {
         const token = req.headers["token"] || req.cookies.token;
+        // console.log(token)
         
         if (!token) {
             return res.status(404).json({ message: "No token found" });
@@ -14,7 +15,7 @@ async function getAuthUser(req, res, next) {
             return res.status(404).json({ message: "No token found" });
         }
 
-        const user = await User.findById(decoded.id);
+        const user = await User.findById(decoded.id).select("-password -otp -pin");
         if (!user) {
             return res.status(404).json({ message: "No user found" });
         }

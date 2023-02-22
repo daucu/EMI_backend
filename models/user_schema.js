@@ -49,6 +49,14 @@ const user_sehema = new mongoose.Schema({
     // type: mixed,
     type: mongoose.Schema.Types.Mixed,
   },
+  pin: {
+    type: String,
+
+  },
+  have_pin: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("User", user_sehema);

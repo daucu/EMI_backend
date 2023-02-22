@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/user_schema");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getAuthUser } = require("../config/authorizer")
 
 
 
@@ -55,6 +56,8 @@ router.post("/", validateLogin, async (req, res) => {
 
     let userdata = user;
     delete userdata.password;
+    delete userdata.otp;
+    delete userdata.pin;
 
     res.status(200).json({
       message: "You have logged in successfully",
@@ -69,60 +72,210 @@ router.post("/", validateLogin, async (req, res) => {
 });
 
 // check user is login or not
-router.get("/check", (req, res) => {
+router.get("/check", getAuthUser, async (req, res) => {
   try {
-    let token = req.cookies.token || req.headers.token;
-    // console.log(token);
-    const have_valid_token = jwt.verify(token, process.env.JWT_SECRET);
 
-    // get user if from token
-    const id_from_token = have_valid_token.id;
+    const user = req.user;
 
-    // check same id have database
-    const user_id = User.findById(id_from_token);
-    if (user_id == undefined) {
-      res.json(false);
-    } else {
-      res.json(true);
+    if (!user) {
+      return res.status(404).json({
+        logged_in: false
+      });
     }
+    let userdata = user;
+    delete userdata.password;
+    delete userdata.otp;
+    delete userdata.pin;
+
+    res.status(200).json({
+      logged_in: true,
+      have_pin: user.have_pin,
+      user: userdata
+    });
+
   } catch (error) {
-    res.json(false);
+    res.json({
+      message: error.message,
+      status: "error",
+      logged_in: false
+    });
   }
 });
 
-// check valid token
-router.get("/check_valid_token", (req, res) => {
+
+
+// check pin 
+router.post("/check/pin", getAuthUser, async (req, res) => {
   try {
-    let token = req.cookies.token || req.headers.token;
+    const { pin } = req.body;
+    const user = await User.findById(req.user.id).lean();
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "User not found ", status: "warning" });
 
-    // console.log(token);
-    const have_valid_token = jwt.verify(token, process.env.JWT_SECRET);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
-});
 
-// check token id is same with user id
-router.get("/checkLogin", (req, res) => {
-  try {
-    let token = req.cookies.token || req.headers.token;
-
-    const have_valid_token = jwt.verify(token, process.env.JWT_SECRET);
-    // get user id from token
-    const id_from_token = have_valid_token.id;
-
-    // check same id have same database
-    const user_id = User.findById(id_from_token);
-    if (user_id == undefined) {
-      res.json(false);
-    } else {
-      res.json(true);
+    if (user.role !== "seller") {
+      return res
+        .status(400)
+        .json({ message: "You are not a seller ", status: "warning" });
     }
+
+    if (user.pin !== pin) {
+      return res
+        .status(400)
+        .json({ message: "PIN is Wrong", status: "warning" });
+    }
+
+    let userdata = user;
+    delete userdata.password;
+    delete userdata.otp;
+    delete userdata.pin;
+
+    res.status(200).json({
+      message: "Pin is correct",
+      status: "success",
+      user: userdata
+    });
   } catch (error) {
-    res.json(false);
+    res.status(500).json({ message: error.message, status: "error" });
   }
 });
+
+
+// add  pin 
+router.post("/add/pin", getAuthUser, async (req, res) => {
+  try {
+    const { pin } = req.body;
+    const pin_valid = validatePin(pin);
+
+    if (!pin_valid)
+      return res
+        .status(400)
+        .json({ message: "Pin must be 4 digit", status: "warning" });
+        
+    const user = await User.findById(req.user.id).lean();
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "User not found ", status: "warning" });
+
+
+    if (user.role !== "seller") {
+      return res
+        .status(400)
+        .json({ message: "You are not a seller ", status: "warning" });
+    }
+
+    const update = await User.findByIdAndUpdate(req.user.id, { 
+      pin: pin,
+      have_pin: true 
+    }, { new: true });
+
+    let userdata = update;
+    delete userdata.password;
+    delete userdata.otp;
+    delete userdata.pin;
+
+    res.status(200).json({
+      message: "Pin updated successfully",
+      status: "success",
+      user: userdata
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message, status: "error" });
+  }
+});
+
+// change  pin 
+router.post("/change/pin", getAuthUser, async (req, res) => {
+  try {
+    const { old_pin, new_pin } = req.body;
+    const o_validpin = validatePin(old_pin);
+    const n_validpin = validatePin(new_pin);
+
+    if (!o_validpin && !n_validpin)
+      return res
+        .status(400)
+        .json({ message: "Old Pin must be 4 digit", status: "warning" });
+
+    const user = await User.findById(req.user.id).lean();
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "User not found ", status: "warning" });
+
+
+    if (user.role !== "seller") {
+      return res
+        .status(400)
+        .json({ message: "You are not a seller ", status: "warning" });
+    }
+
+    if (user.pin !== old_pin) {
+      return res
+        .status(400)
+        .json({ message: "Old Pin is incorrect.", status: "warning" });
+    }
+
+    const update = await User.findByIdAndUpdate(req.user.id, { 
+      pin: new_pin,
+      have_pin: true 
+    }, { new: true });
+
+    let userdata = update;
+    delete userdata.password;
+    delete userdata.otp;
+    delete userdata.pin;
+
+    res.status(200).json({
+      message: "Pin updated successfully",
+      status: "success",
+      user: userdata
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message, status: "error" });
+  }
+});
+
+// change  pin 
+router.delete("/remove/pin", getAuthUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).lean();
+    if (!user)
+      return res
+        .status(400)
+        .json({ message: "User not found ", status: "warning" });
+
+
+    if (user.role !== "seller") {
+      return res
+        .status(400)
+        .json({ message: "You are not a seller ", status: "warning" });
+    }
+
+    const update = await User.findByIdAndUpdate(req.user.id, { 
+      have_pin: false 
+    }, { new: true });
+
+    let userdata = update;
+    delete userdata.password;
+    delete userdata.otp;
+    delete userdata.pin;
+
+    res.status(200).json({
+      message: "Pin updated successfully",
+      status: "success",
+      user: userdata
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message, status: "error" });
+  }
+});
+
+
+
+
 
 function validateLogin(req, res, next) {
   const { email, password } = req.body;
@@ -141,6 +294,16 @@ function validateLogin(req, res, next) {
 
   next();
 
+}
+
+function validatePin(pin) {
+  if(pin.length !== 4) {
+    return false;
+  }
+  if(isNaN(pin)) {
+    return false;
+  }
+  return true;
 }
 
 module.exports = router;
