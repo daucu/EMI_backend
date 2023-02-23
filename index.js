@@ -88,6 +88,11 @@ app.use("/api/transactions", require("./routes/transaction"));
 // history details
 app.use("/api/history", require("./routes/history"));
 
+// notification details
+app.use("/api/notification", require("./routes/notification"));
+
+// history details
+app.use("/api/payments", require("./routes/payments"));
 
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);

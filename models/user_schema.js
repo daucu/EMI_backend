@@ -51,12 +51,14 @@ const user_sehema = new mongoose.Schema({
   },
   pin: {
     type: String,
-
   },
   have_pin: {
     type: Boolean,
+    required: true,
     default: false,
   },
+},{
+  timestamps: true,
 });
 
 module.exports = mongoose.model("User", user_sehema);
