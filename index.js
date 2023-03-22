@@ -14,8 +14,7 @@ connectDB();
 const allowedOrigins = [
   "https://angler360-front.vercel.app",
   "http://localhost:3000",
-  "http://localhost:3001",
-  "http://192.168.1.106:3000",
+  "https://emi-dashboard-9edcp8.dauqu.host"
 ];
 
 // static files
