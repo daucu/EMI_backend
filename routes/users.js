@@ -4,10 +4,13 @@ const jwt = require("jsonwebtoken");
 const { getAuthUser } = require('../config/authorizer');
 
 // get user
-router.get("/", async (req, res) => {
+router.get("/role/:role", async (req, res) => {
     // res.json({ message: "Getting signup API" })
+    const { role } = req.params;
     try {
-        const user = await User_Schema.find().populate([
+        const user = await User_Schema.find({
+            role: role
+        }).populate([
             {
                 path: "bank",
 
@@ -18,6 +21,7 @@ router.get("/", async (req, res) => {
         res.status(500).json({ message: "error in getting user", status: "error" });
     }
 });
+
 
 // code to count all users
 router.get("/count/alluser", async (req, res) => {

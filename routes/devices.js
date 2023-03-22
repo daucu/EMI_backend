@@ -4,13 +4,27 @@ const Device = require('../models/device_schema');
 
 router.get('/', getAuthUser, async (req, res) => {
     try {
-        if (req.user.role !== 'seller') {
-            return res.json({ message: 'You are not authorized.' });
+        let allDevices = [];
+        if (req.user.role === 'admin') {
+            allDevices = await Device.find().populate([
+                {
+                    path: 'seller',
+                    select: 'name email',
+                },
+                {
+                    path: 'user',
+                    select: 'name email',
+                },
+            ]);
+            return res.json(allDevices);
         }
-        const devices = await Device.find({
-            seller: req.user._id,
-        });
-        res.json(devices);
+        else if (req.user.role === 'seller') {
+            allDevices = await Device.find({
+                seller: req.user._id,
+            });
+            return res.json(allDevices);
+        }
+        return res.json({ message: 'You are not authorized.' });
     } catch (err) {
         res.json({ message: err.message });
     }

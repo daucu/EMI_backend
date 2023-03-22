@@ -6,13 +6,27 @@ const Transaction = require('../models/transaction_schema');
 
 router.get('/', async (req, res) => {
     try {
-        const transaction = await Transaction.find();
-        res.json({
+        const transaction = await Transaction.find().populate([
+            {
+                path: 'user_id'
+            },
+            {
+                path: 'device_id',
+            },
+            {
+                path: 'seller'
+            },
+            {
+                path: 'emi_id'
+            }
+        ]);
+
+        return res.json({
             message: 'Transaction details fetched successfully',
             transaction
         });
     } catch (error) {
-        res.status(500).json({ message: 'error in getting transaction details' });
+        res.status(500).json({ message: error.message });
     }
 });
 

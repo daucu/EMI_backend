@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const user_sehema = new mongoose.Schema({
   name: {
     type: String,
+    required: true,
   },
   business_name: {
     type: String,
@@ -33,6 +34,7 @@ const user_sehema = new mongoose.Schema({
     type: String,
     reqired: true,
     default: "user",
+    enum: ["user", "admin", "seller"],
   },
   image: {
     type: String,

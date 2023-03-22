@@ -3,6 +3,8 @@ const { getAuthUser } = require('../config/authorizer');
 const router = require('express').Router();
 const Device = require('../models/device_schema');
 const Payment = require('../models/payment_schema');
+const User = require('../models/user_schema');
+const Transactions = require('../models/transaction_schema');
 
 
 router.get('/devices', getAuthUser, async (req, res) => {
@@ -70,6 +72,31 @@ router.get('/payments', getAuthUser, async (req, res) => {
         }
         else {
             return res.json({ pending_payments, success_payments, total_payments, total_loan });
+        }
+    } catch (err) {
+        return res.json({ message: err.message });
+    }
+});
+
+
+router.get('/stats', getAuthUser, async (req, res) => {
+    try {
+        const user = req.user;
+        let total_users = 0;
+        let total_sellers = 0;
+        let total_devices = 0;
+        let total_transactions = 0;
+
+        if (user.role === "admin") {
+            total_users = await User.find({ role: "user" }).countDocuments();
+            total_sellers = await User.find({ role: "seller" }).countDocuments();
+            total_devices = await Device.find({}).countDocuments();
+            total_transactions = await Transactions.find({}).countDocuments();
+            return res.json({ total_users, total_sellers, total_devices, total_transactions });
+        }
+
+        else {
+            return res.json({ total_users, total_sellers, total_devices, total_transactions });
         }
     } catch (err) {
         return res.json({ message: err.message });

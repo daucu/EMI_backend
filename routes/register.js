@@ -47,9 +47,9 @@ router.post("/", SignupValidation, async (req, res) => {
 
   try {
     const newUser = await user.save();
-    res.json(newUser);
+    return res.status(200).json(newUser);
   } catch (error) {
-    res.status(500).json({ message: error.message, status: "error" });
+    return res.status(500).json({ message: error.message, status: "error" });
   }
 }
 );
@@ -83,6 +83,14 @@ async function SignupValidation(req, res, next) {
         status: "error",
       });
   }
+
+  // if password length is less than 6 characters
+  if (req.body.password.length < 6)
+    return res
+      .status(400)
+      .json({ message: "Password is too short", status: "error" });
+    
+      
   next();
 }
 

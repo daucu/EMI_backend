@@ -15,14 +15,19 @@ const allowedOrigins = [
   "https://angler360-front.vercel.app",
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://192.168.1.106:3000",
 ];
 
-app.use(logger)
+// static files
 app.use(express.static(__dirname + "/medias"));
 app.use(express.static(__dirname + "/qrcodes"));
 app.use(express.static(__dirname + "/uploads"));
+
+// middlewares 
+app.use(logger)
 app.use(cookieParser());
 app.use(express.json());
+
 //CORS policy access
 app.use(
   cors({
@@ -30,13 +35,14 @@ app.use(
     credentials: true,
   })
 );
-app.use(cookieParser());
 
 
-
+// test route
 app.get("/", (req, res) => {
   res.json({ message: "EMI Api is  working" });
 });
+
+// qr code route
 app.get("/api/qrcode", async (req, res) => {
   const qrcode = await getQRCode(req, {
     additional: "additional",
@@ -45,6 +51,8 @@ app.get("/api/qrcode", async (req, res) => {
   res.json(qrcode);
 });
 
+// ===-===-=== all routes ===-===-===
+//dashboard
 app.use("/api/dashboard", require("./routes/dashboard"));
 
 
@@ -54,6 +62,8 @@ app.use("/api/register", require("./routes/register"));
 // users
 app.use("/api/users", require("./routes/users"));
 
+// emi details
+app.use("/api/emi", require("./routes/emis"));
 
 // login api
 app.use("/api/login", require("./routes/login"));
@@ -93,6 +103,7 @@ app.use("/api/notification", require("./routes/notification"));
 
 // history details
 app.use("/api/payments", require("./routes/payments"));
+
 
 app.listen(PORT, () => {
   console.log(`server is running on ${PORT}`);

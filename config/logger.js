@@ -13,7 +13,7 @@ function getColor(method){
     }
 }
 function logger(req, res, next) {
-    console.log(getColor(req.method)+" "+req.method+" \u001b[0m"+req.url);
+    console.log(req.get('host')+" "+ getColor(req.method)+" "+req.method+" \u001b[0m"+req.url);
     next();
 }
 

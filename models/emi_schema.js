@@ -1,5 +1,4 @@
-const express = require("express");
-const router = express.Router();
+const mongoose = require("mongoose");
 
 const emi_schema = new mongoose.Schema({
   user_id: {
