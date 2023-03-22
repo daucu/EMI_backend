@@ -38,7 +38,7 @@ app.use(
 
 // test route
 app.get("/", (req, res) => {
-  res.json({ message: "EMI Api is  working ..." });
+  res.json({ message: "EMI Api is  working ...!!" });
 });
 
 // qr code route
