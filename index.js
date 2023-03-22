@@ -39,7 +39,7 @@ app.use(
 
 // test route
 app.get("/", (req, res) => {
-  res.json({ message: "EMI Api is  working" });
+  res.json({ message: "EMI Api is  working ..." });
 });
 
 // qr code route
@@ -106,5 +106,5 @@ app.use("/api/payments", require("./routes/payments"));
 
 
 app.listen(PORT, () => {
-  console.log(`server is running on ${PORT}`);
+  console.log(`server is running on ${PORT} !!`);
 });
