@@ -14,7 +14,8 @@ connectDB();
 const allowedOrigins = [
   "https://angler360-front.vercel.app",
   "http://localhost:3000",
-  "https://emi-dashboard-9edcp8.dauqu.host"
+  "https://emi-dashboard-9edcp8.dauqu.host",
+  "http://192.168.1.100:3000",
 ];
 
 // static files
@@ -100,8 +101,11 @@ app.use("/api/history", require("./routes/history"));
 // notification details
 app.use("/api/notification", require("./routes/notification"));
 
-// history details
+// payment details
 app.use("/api/payments", require("./routes/payments"));
+
+// support details
+app.use("/api/support", require("./routes/support"));
 
 
 app.listen(PORT, () => {
