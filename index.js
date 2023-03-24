@@ -13,9 +13,9 @@ connectDB();
 //Loop of allowed origins
 const allowedOrigins = [
   "https://angler360-front.vercel.app",
-  "http://localhost:3000",
   "https://emi-dashboard-9edcp8.dauqu.host",
-  "http://192.168.1.100:3000",
+  "http://localhost:3000",
+  // "http://192.168.1.100:3000",
 ];
 
 // static files
@@ -109,5 +109,5 @@ app.use("/api/support", require("./routes/support"));
 
 
 app.listen(PORT, () => {
-  console.log(`server is running on ${PORT} !!`);
+  console.log(`server is running on ${PORT} !!!!`);
 });
