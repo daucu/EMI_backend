@@ -4,7 +4,7 @@ const path = require("path");
 
 async function getQRCode(req, data) {
     let name = "qr_" + Math.floor(Math.random() * 1000).toString() + "_" + Date.now().toString() + ".png";
-    let file_url = req.protocol+ "://" +req.get('host') + "/" + name;
+    let file_url = process.env.API_URL + "/" + name;
     let file_path = path.join(__dirname, `/../qrcodes/${name}`);
     let qr_data = {
         ...data,
