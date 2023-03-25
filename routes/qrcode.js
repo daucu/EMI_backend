@@ -21,8 +21,7 @@ async function getQRCode(req, data) {
     }).then(() => {
         return qr_data;
     }).catch(err => {
-            console.log(err);
-            return err;
+            return res.status(500).json({ message: err.message, status: "error" });
         });
 }
 

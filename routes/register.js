@@ -11,7 +11,7 @@ router.post("/", SignupValidation, async (req, res) => {
 
   // hashing password
   const salt = await bcryptjs.genSalt();
-  const hashed_password = await bcryptjs.hash(req.body.password, salt);
+  const hashed_password = await bcryptjs.hash(req.body?.password, salt);
 
   const initBank = new Bank();
   await initBank.save();
@@ -19,14 +19,11 @@ router.post("/", SignupValidation, async (req, res) => {
   const user = new User_Schema({
     ...req.body,
     password: hashed_password,
-    age: req.body.age || "",
-    image: req.body.image || "",
-    role: req.body.role || "user",
+    role: req.body?.role || "user",
     bank: initBank._id,
-    business_name: req.body.business_name || ""
   });
 
-  if(req.body.role === "seller"){
+  if(req.body?.role === "seller"){
     let qr_data = {
       _id: user._id,
       name: user.name,
@@ -35,13 +32,13 @@ router.post("/", SignupValidation, async (req, res) => {
     };
 
     let qr_code = "";
-    if (req.body.role === "seller") {
+    if (req.body?.role === "seller") {
       qr_code = await getQRCode(req, qr_data);
     }
     user.qr_code = {
-      name: qr_code.file_name,
-      path: qr_code.file_path,
-      url: qr_code.file_url,
+      name: qr_code?.file_name,
+      path: qr_code?.file_path,
+      url: qr_code?.file_url,
     };
   };
 
@@ -58,14 +55,14 @@ router.post("/", SignupValidation, async (req, res) => {
 // middleware for register user validation
 async function SignupValidation(req, res, next) {
   // check if user exist
-  const user = await User_Schema.findOne({ email: req.body.email });
+  const user = await User_Schema.findOne({ email: req.body?.email });
   if (user)
     return res
       .status(400)
       .json({ message: "User already exists", status: "error" });
 
   // check email is valid
-  const email = req.body.email;
+  const email = req.body?.email;
   const email_regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   if (!email_regex.test(email))
     return res
@@ -74,7 +71,7 @@ async function SignupValidation(req, res, next) {
 
 
   //Check Phone Number is valid
-  if (req.body.phone) {
+  if (req.body?.phone) {
     const phone = req.body.phone;
     const phone_regex = /^[0-9]{10}$/;
     if (!phone_regex.test(phone))
@@ -85,7 +82,7 @@ async function SignupValidation(req, res, next) {
   }
 
   // if password length is less than 6 characters
-  if (req.body.password.length < 6)
+  if (req.body?.password?.length < 6)
     return res
       .status(400)
       .json({ message: "Password is too short", status: "error" });
