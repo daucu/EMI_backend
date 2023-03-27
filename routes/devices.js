@@ -40,6 +40,8 @@ router.post('/', getAuthUser, async (req, res) => {
             user: req.body.user,
             seller: req.user._id,
             imei_no: req.body.imei_no,
+            serial_number: req.body.serial_number,
+            mac_address: req.body.mac_address,
             device_name: req.body.device_name,
             device_type: req.body.device_type,
             device_model: req.body.device_model,

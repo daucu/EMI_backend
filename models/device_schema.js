@@ -18,6 +18,14 @@ const DeviceSchema = new Schema({
         required: true,
         unique: true
     },
+    serial_number: {
+        type: String,
+        required: true,
+    },
+    mac_address: {
+        type: String,
+        required: true,
+    },
     device_price: {
         type: Number,
         required: true

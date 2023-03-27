@@ -48,8 +48,12 @@ const user_sehema = new mongoose.Schema({
     ref: "User",
   },
   qr_code: {
-    // type: mixed,
     type: mongoose.Schema.Types.Mixed,
+  },
+
+  active_emi: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Emi",
   },
   pin: {
     type: String,
